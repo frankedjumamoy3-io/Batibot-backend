@@ -19,7 +19,7 @@ describe("BatiBot API foundation", () => {
     expect(response.headers["x-request-id"]).toEqual(expect.any(String));
     expect(response.body).toMatchObject({
       data: {
-        service: "batibot-api",
+        service: "batibot-backend",
         status: "healthy",
       },
       meta: {
@@ -33,7 +33,7 @@ describe("BatiBot API foundation", () => {
 
     expect(response.body.data).toEqual({
       apiVersion: "v1",
-      service: "batibot-api",
+      service: "batibot-backend",
       status: "ready",
     });
   });

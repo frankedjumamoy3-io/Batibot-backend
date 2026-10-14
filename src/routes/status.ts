@@ -7,7 +7,7 @@ export const statusRouter = Router();
 statusRouter.get("/", (_request, response) => {
   sendSuccess(response, {
     apiVersion: "v1",
-    service: "batibot-api",
+    service: "batibot-backend",
     status: "ready",
   });
 });

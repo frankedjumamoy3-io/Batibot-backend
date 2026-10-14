@@ -9,7 +9,7 @@ const server = app.listen(environment.PORT, "0.0.0.0", () => {
     JSON.stringify({
       event: "server.started",
       port: environment.PORT,
-      service: "batibot-api",
+      service: "batibot-backend",
     })
   );
 });

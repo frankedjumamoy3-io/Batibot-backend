@@ -1,4 +1,4 @@
-# BatiBot API
+# BatiBot Backend
 
 Private Node.js/Express API for controlled BatiBot Android APK testing.
 

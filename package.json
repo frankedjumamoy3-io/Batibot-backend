@@ -1,5 +1,5 @@
 {
-  "name": "batibot-api",
+  "name": "batibot-backend",
   "version": "0.1.0",
   "private": true,
   "description": "Controlled-testing backend API for the BatiBot Android application.",

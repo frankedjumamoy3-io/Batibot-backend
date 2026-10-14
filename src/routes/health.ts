@@ -6,7 +6,7 @@ export const healthRouter = Router();
 
 healthRouter.get("/", (_request, response) => {
   sendSuccess(response, {
-    service: "batibot-api",
+    service: "batibot-backend",
     status: "healthy",
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
