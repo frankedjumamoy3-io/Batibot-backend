@@ -21,5 +21,10 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, _ne
     return;
   }
 
+  if (error instanceof SyntaxError && "status" in error && error.status === 400) {
+    sendFailure(response, 400, "INVALID_JSON", "The request body is not valid JSON.");
+    return;
+  }
+
   sendFailure(response, 500, "INTERNAL_ERROR", "The service could not complete the request.");
 };

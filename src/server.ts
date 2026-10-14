@@ -1,8 +1,20 @@
+import "dotenv/config";
+
 import { createApp } from "./app.js";
-import { loadEnvironment } from "./config/environment.js";
+import { AuthService } from "./auth/auth-service.js";
+import { UserRepository } from "./auth/user-repository.js";
+import { loadEnvironment, requireServiceConfiguration } from "./config/environment.js";
+import { checkDatabase, createDatabasePool } from "./database/pool.js";
 
 const environment = loadEnvironment();
-const app = createApp(environment);
+const configuration = requireServiceConfiguration(environment);
+const pool = createDatabasePool(configuration.databaseUrl, environment.DATABASE_SSL);
+const users = new UserRepository(pool);
+const authService = new AuthService(pool, users, environment);
+const app = createApp(environment, {
+  authService,
+  databaseHealthCheck: () => checkDatabase(pool),
+});
 
 const server = app.listen(environment.PORT, "0.0.0.0", () => {
   console.log(
@@ -20,7 +32,10 @@ function shutdown(signal: string) {
     if (error) {
       console.error(JSON.stringify({ event: "server.stop_failed" }));
       process.exitCode = 1;
+      return;
     }
+
+    void pool.end();
   });
 }
 

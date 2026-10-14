@@ -3,13 +3,24 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 
+import type { AuthService } from "./auth/auth-service.js";
 import type { Environment } from "./config/environment.js";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { requestContext } from "./middleware/request-context.js";
-import { healthRouter } from "./routes/health.js";
+import { createAdminStatusRouter } from "./routes/admin-status.js";
+import { createAuthRouter } from "./routes/auth.js";
+import { createHealthRouter } from "./routes/health.js";
 import { statusRouter } from "./routes/status.js";
 
-export function createApp(environment: Environment) {
+export interface ApplicationDependencies {
+  authService?: AuthService;
+  databaseHealthCheck?: () => Promise<void>;
+}
+
+export function createApp(
+  environment: Environment,
+  dependencies: ApplicationDependencies = {}
+) {
   const app = express();
 
   app.disable("x-powered-by");
@@ -40,8 +51,12 @@ export function createApp(environment: Environment) {
     })
   );
 
-  app.use("/health", healthRouter);
+  app.use("/health", createHealthRouter(dependencies.databaseHealthCheck));
   app.use("/api/v1/status", statusRouter);
+  if (dependencies.authService) {
+    app.use("/api/v1/auth", createAuthRouter(dependencies.authService));
+    app.use("/api/v1/admin/status", createAdminStatusRouter(dependencies.authService));
+  }
 
   app.use(notFoundHandler);
   app.use(errorHandler);

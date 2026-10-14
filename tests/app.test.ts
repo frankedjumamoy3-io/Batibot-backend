@@ -2,13 +2,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 
 import { createApp } from "../src/app.js";
-import type { Environment } from "../src/config/environment.js";
-
-const testEnvironment: Environment = {
-  LOG_LEVEL: "silent",
-  NODE_ENV: "test",
-  PORT: 3_000,
-};
+import { testEnvironment } from "./test-environment.js";
 
 describe("BatiBot API foundation", () => {
   const app = createApp(testEnvironment);
