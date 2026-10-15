@@ -1,0 +1,3 @@
+ALTER TABLE curated_quizzes ADD COLUMN content JSONB NOT NULL DEFAULT '{}'::JSONB;
+ALTER TABLE curated_quizzes ADD COLUMN phase TEXT;
+ALTER TABLE quiz_questions ADD COLUMN content JSONB NOT NULL DEFAULT '{}'::JSONB;

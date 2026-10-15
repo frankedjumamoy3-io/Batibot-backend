@@ -17,7 +17,11 @@ Private Node.js/Express API for controlled BatiBot Android APK testing.
 - `admin` / `tester` / `learner` role enforcement
 - idempotent administrator bootstrap command
 - Render Blueprint configuration
-- no asset uploads, AI generation, or mobile integration yet
+- published quiz reads and protected manual quiz administration
+- curriculum/answer integrity validation and transactional audit logs
+- sanitized optional test-attempt reporting
+- Android APK adapters in the sibling frontend repository
+- no asset uploads or AI generation
 
 ## Requirements
 
@@ -56,6 +60,15 @@ POST /api/v1/auth/refresh
 POST /api/v1/auth/logout
 GET /api/v1/auth/me
 GET /api/v1/admin/status
+GET /api/v1/quizzes
+GET /api/v1/quizzes/:id
+POST /api/v1/quiz-attempts
+GET /api/v1/admin/quizzes
+GET /api/v1/admin/quizzes/:id
+POST /api/v1/admin/quizzes
+PATCH /api/v1/admin/quizzes/:id
+DELETE /api/v1/admin/quizzes/:id
+GET /api/v1/admin/activity-logs
 ```
 
 Success responses use:

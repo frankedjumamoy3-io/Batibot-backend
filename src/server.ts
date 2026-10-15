@@ -5,6 +5,7 @@ import { AuthService } from "./auth/auth-service.js";
 import { UserRepository } from "./auth/user-repository.js";
 import { loadEnvironment, requireServiceConfiguration } from "./config/environment.js";
 import { checkDatabase, createDatabasePool } from "./database/pool.js";
+import { QuizRepository } from "./quizzes/repository.js";
 
 const environment = loadEnvironment();
 const configuration = requireServiceConfiguration(environment);
@@ -12,6 +13,7 @@ const pool = createDatabasePool(configuration.databaseUrl, environment.DATABASE_
 const users = new UserRepository(pool);
 const authService = new AuthService(pool, users, environment);
 const app = createApp(environment, {
+  quizzes: new QuizRepository(pool),
   authService,
   databaseHealthCheck: () => checkDatabase(pool),
 });

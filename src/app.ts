@@ -11,8 +11,11 @@ import { createAdminStatusRouter } from "./routes/admin-status.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createHealthRouter } from "./routes/health.js";
 import { statusRouter } from "./routes/status.js";
+import { createQuizRouter } from "./routes/quizzes.js";
+import type { QuizRepository } from "./quizzes/repository.js";
 
 export interface ApplicationDependencies {
+  quizzes?: QuizRepository;
   authService?: AuthService;
   databaseHealthCheck?: () => Promise<void>;
 }
@@ -56,6 +59,7 @@ export function createApp(
   if (dependencies.authService) {
     app.use("/api/v1/auth", createAuthRouter(dependencies.authService));
     app.use("/api/v1/admin/status", createAdminStatusRouter(dependencies.authService));
+    if (dependencies.quizzes) app.use("/api/v1", createQuizRouter(dependencies.quizzes, dependencies.authService));
   }
 
   app.use(notFoundHandler);
