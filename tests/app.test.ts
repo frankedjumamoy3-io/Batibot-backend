@@ -7,6 +7,16 @@ import { testEnvironment } from "./test-environment.js";
 describe("BatiBot API foundation", () => {
   const app = createApp(testEnvironment);
 
+  it("trusts only the configured nearest proxy", async () => {
+    const proxied = createApp({ ...testEnvironment, TRUST_PROXY_HOPS: 1 });
+    // Do not trust earlier, caller-supplied entries in X-Forwarded-For.
+    const trust = proxied.get("trust proxy fn") as (ip: string, hop: number) => boolean;
+    expect(trust("127.0.0.1", 0)).toBe(true);
+    expect(trust("203.0.113.1", 1)).toBe(false);
+    expect(app.get("trust proxy")).toBe(0);
+    await request(proxied).get("/health").set("X-Forwarded-For", "198.51.100.1, 203.0.113.1").expect(200);
+  });
+
   it("reports process health with a request ID", async () => {
     const response = await request(app).get("/health").expect(200);
 

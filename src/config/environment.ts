@@ -19,6 +19,7 @@ const environmentSchema = z.object({
     .default("info"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().max(65_535).default(3_000),
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(1).default(0),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().max(90).default(14),
 });
 

@@ -11,5 +11,6 @@ export const testEnvironment: Environment = {
   LOG_LEVEL: "silent",
   NODE_ENV: "test",
   PORT: 3_000,
+  TRUST_PROXY_HOPS: 0,
   REFRESH_TOKEN_TTL_DAYS: 14,
 };

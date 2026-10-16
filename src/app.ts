@@ -27,6 +27,8 @@ export function createApp(
   const app = express();
 
   app.disable("x-powered-by");
+  // Trust only the nearest proxy on Render; never trust arbitrary forwarded headers.
+  app.set("trust proxy", environment.TRUST_PROXY_HOPS);
   app.use(requestContext);
   app.use(
     pinoHttp({
