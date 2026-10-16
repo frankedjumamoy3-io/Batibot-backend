@@ -10,6 +10,7 @@ import { requestContext } from "./middleware/request-context.js";
 import { createAdminStatusRouter } from "./routes/admin-status.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createHealthRouter } from "./routes/health.js";
+import { createMonitoringRouter } from "./routes/monitoring.js";
 import { statusRouter } from "./routes/status.js";
 import { createQuizRouter } from "./routes/quizzes.js";
 import type { QuizRepository } from "./quizzes/repository.js";
@@ -61,6 +62,15 @@ export function createApp(
   if (dependencies.authService) {
     app.use("/api/v1/auth", createAuthRouter(dependencies.authService));
     app.use("/api/v1/admin/status", createAdminStatusRouter(dependencies.authService));
+    app.use(
+      "/api/v1/admin/monitoring",
+      createMonitoringRouter(
+        dependencies.authService,
+        environment,
+        dependencies.quizzes,
+        dependencies.databaseHealthCheck
+      )
+    );
     if (dependencies.quizzes) app.use("/api/v1", createQuizRouter(dependencies.quizzes, dependencies.authService));
   }
 

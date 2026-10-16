@@ -86,6 +86,33 @@ export class QuizRepository {
     return { id };
   }
 
+  async stats() {
+    const counts = await this.pool.query<{ status: string; count: string }>(
+      `SELECT status, COUNT(*)::text as count FROM curated_quizzes GROUP BY status`
+    );
+    const attempts = await this.pool.query<{ count: string }>(
+      `SELECT COUNT(*)::text as count FROM quiz_attempts`
+    );
+    const logs = await this.pool.query<{ count: string }>(
+      `SELECT COUNT(*)::text as count FROM admin_activity_logs`
+    );
+    const byStatus: Record<string, number> = {};
+    let total = 0;
+    for (const row of counts.rows) {
+      const c = parseInt(row.count, 10) || 0;
+      byStatus[row.status] = c;
+      total += c;
+    }
+    return {
+      totalQuizzes: total,
+      publishedQuizzes: byStatus["published"] ?? 0,
+      draftQuizzes: byStatus["draft"] ?? 0,
+      archivedQuizzes: byStatus["archived"] ?? 0,
+      totalAttempts: parseInt(attempts.rows[0]?.count ?? "0", 10) || 0,
+      totalActivityLogs: parseInt(logs.rows[0]?.count ?? "0", 10) || 0,
+    };
+  }
+
   private async log(client: pg.PoolClient, actor: string, id: string, action: string) {
     await client.query(`INSERT INTO admin_activity_logs (id,actor_user_id,action,entity_type,entity_id) VALUES ($1,$2,$3,'quiz',$4)`, [randomUUID(), actor, action, id]);
   }
