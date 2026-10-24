@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 const environmentSchema = z.object({
+  OPENAI_API_KEY: optionalNonEmptyString(),
+  OPENAI_MODEL: z.string().regex(/^gpt-[a-z0-9.-]+$/).default("gpt-6.1-sol"),
+  AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(90000).default(60000),
+  CORS_ALLOWED_ORIGINS: z.string().default("").transform(value => value.split(",").map(origin => origin.trim()).filter(Boolean)),
   ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().max(60).default(15),
   ADMIN_BOOTSTRAP_DISPLAY_NAME: z.string().trim().min(1).max(100).default("BatiBot Admin"),
   ADMIN_BOOTSTRAP_EMAIL: optionalNonEmptyString(),

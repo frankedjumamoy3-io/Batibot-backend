@@ -16,6 +16,7 @@
     "admin:bootstrap": "node dist/scripts/bootstrap-admin.js",
     "admin:bootstrap:dev": "tsx src/scripts/bootstrap-admin.ts",
     "test:deployment": "tsx src/scripts/smoke-deployment.ts",
+    "test:ai-live": "tsx src/scripts/smoke-ai.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
