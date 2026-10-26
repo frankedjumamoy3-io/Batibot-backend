@@ -34,6 +34,15 @@ const authenticationRateLimit = rateLimit({
 export function createAuthRouter(authService: AuthService) {
   const router = Router();
 
+  router.post("/register", authenticationRateLimit, async (request, response) => {
+    const input = loginSchema.extend({
+      password: z.string().min(8).max(256),
+      displayName: z.string().trim().min(2).max(40),
+      gradeLevel: z.enum(["Preschool", "Kindergarten", "Grade 1", "Grade 2", "Grade 3"]),
+    }).strict().parse(request.body);
+    sendSuccess(response, await authService.register(input), 201);
+  });
+
   router.post("/login", authenticationRateLimit, async (request, response) => {
     const input = loginSchema.parse(request.body);
     const session = await authService.login(input.email, input.password);

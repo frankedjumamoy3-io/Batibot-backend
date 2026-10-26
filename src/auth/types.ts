@@ -2,6 +2,7 @@ export type AppRole = "admin" | "tester" | "learner";
 export type AppUserStatus = "active" | "disabled";
 
 export interface AppUser {
+  gradeLevel?: string | null;
   createdAt: Date;
   displayName: string;
   email: string;

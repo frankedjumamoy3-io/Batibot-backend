@@ -4,6 +4,7 @@ import type { DatabasePool } from "../database/pool.js";
 import type { AppRole, AppUser, AppUserStatus } from "./types.js";
 
 interface AppUserRow {
+  grade_level: string | null;
   created_at: Date;
   display_name: string;
   email: string;
@@ -16,6 +17,7 @@ interface AppUserRow {
 
 function mapUser(row: AppUserRow): AppUser {
   return {
+    gradeLevel: row.grade_level,
     createdAt: row.created_at,
     displayName: row.display_name,
     email: row.email,
@@ -30,9 +32,18 @@ function mapUser(row: AppUserRow): AppUser {
 export class UserRepository {
   constructor(private readonly pool: DatabasePool) {}
 
+  async createLearner(input: { email: string; passwordHash: string; displayName: string; gradeLevel: string }): Promise<AppUser> {
+    const result = await this.pool.query<AppUserRow>(
+      `INSERT INTO app_users (id, email, password_hash, display_name, grade_level, role)
+       VALUES ($1, LOWER($2), $3, $4, $5, 'learner') RETURNING *`,
+      [randomUUID(), input.email, input.passwordHash, input.displayName, input.gradeLevel]
+    );
+    return mapUser(result.rows[0]!);
+  }
+
   async findActiveByEmail(email: string): Promise<AppUser | null> {
     const result = await this.pool.query<AppUserRow>(
-      `SELECT id, email, password_hash, display_name, role, status, created_at, updated_at
+      `SELECT id, email, password_hash, display_name, grade_level, role, status, created_at, updated_at
        FROM app_users
        WHERE LOWER(email) = LOWER($1) AND status = 'active'
        LIMIT 1`,
@@ -44,7 +55,7 @@ export class UserRepository {
 
   async findActiveById(id: string): Promise<AppUser | null> {
     const result = await this.pool.query<AppUserRow>(
-      `SELECT id, email, password_hash, display_name, role, status, created_at, updated_at
+      `SELECT id, email, password_hash, display_name, grade_level, role, status, created_at, updated_at
        FROM app_users
        WHERE id = $1 AND status = 'active'
        LIMIT 1`,

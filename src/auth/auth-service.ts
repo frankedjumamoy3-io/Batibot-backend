@@ -1,6 +1,6 @@
 import { createHmac, randomBytes, randomUUID } from "node:crypto";
 
-import { verify as verifyPassword } from "argon2";
+import { hash as hashPassword, verify as verifyPassword } from "argon2";
 import { jwtVerify, SignJWT } from "jose";
 
 import type { Environment } from "../config/environment.js";
@@ -37,6 +37,7 @@ function invalidToken() {
 
 function toPublicUser(user: AppUser): PublicAppUser {
   return {
+    gradeLevel: user.gradeLevel ?? null,
     createdAt: user.createdAt,
     displayName: user.displayName,
     email: user.email,
@@ -72,6 +73,21 @@ export class AuthService {
       refreshTokenTtlDays: environment.REFRESH_TOKEN_TTL_DAYS,
     };
     this.accessTokenKey = new TextEncoder().encode(this.configuration.accessTokenSecret);
+  }
+
+  async register(input: { email: string; password: string; displayName: string; gradeLevel: string }): Promise<AuthSession> {
+    try {
+      const user = await this.users.createLearner({
+        email: input.email.trim().toLowerCase(), displayName: input.displayName.trim(),
+        gradeLevel: input.gradeLevel, passwordHash: await hashPassword(input.password),
+      });
+      return this.createSession(user, randomUUID());
+    } catch (error) {
+      if ((error as { code?: string }).code === "23505") {
+        throw new ApiError(409, "ACCOUNT_EXISTS", "An account already uses this email. Please sign in.");
+      }
+      throw error;
+    }
   }
 
   async login(email: string, password: string): Promise<AuthSession> {

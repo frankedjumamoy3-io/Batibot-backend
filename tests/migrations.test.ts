@@ -38,7 +38,7 @@ describe("PostgreSQL migrations", () => {
     try {
       const result = await runMigrations(pool);
       expect(result.applied).toEqual([]);
-      expect(result.alreadyApplied).toEqual(["001_initial_schema.sql", "002_quiz_content.sql", "003_content_drafts.sql"]);
+      expect(result.alreadyApplied).toEqual(["001_initial_schema.sql", "002_quiz_content.sql", "003_content_drafts.sql", "004_learner_progress.sql"]);
     } finally {
       await pool.end();
     }

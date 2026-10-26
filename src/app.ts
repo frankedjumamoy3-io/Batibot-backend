@@ -19,8 +19,11 @@ import type { ContentRepository } from "./content/repository.js";
 import { createAiRouter } from "./routes/ai.js";
 import { createContentRouter } from "./routes/content.js";
 import { allowBrowserOrigins } from "./middleware/cors.js";
+import type { LearnerProgressRepository } from "./learners/progress-repository.js";
+import { createLearnerProgressRouter } from "./routes/learner-progress.js";
 
 export interface ApplicationDependencies {
+  learnerProgress?: LearnerProgressRepository;
   generator?: ContentGenerator;
   content?: ContentRepository;
   quizzes?: QuizRepository;
@@ -54,7 +57,7 @@ export function createApp(
   );
   app.use(helmet());
   app.use(allowBrowserOrigins(environment.CORS_ALLOWED_ORIGINS));
-  app.use(express.json({ limit: "256kb" }));
+  app.use(express.json({ limit: "1mb" }));
   app.use(
     rateLimit({
       limit: 120,
@@ -68,6 +71,7 @@ export function createApp(
   app.use("/health", createHealthRouter(dependencies.databaseHealthCheck));
   app.use("/api/v1/status", statusRouter);
   if (dependencies.authService) {
+    if (dependencies.learnerProgress) app.use("/api/v1/learner/progress", createLearnerProgressRouter(dependencies.authService, dependencies.learnerProgress));
     app.use("/api/v1/admin/ai", createAiRouter(dependencies.authService, dependencies.generator ?? new OpenAIGenerator(environment)));
     if (dependencies.content) app.use("/api/v1", createContentRouter(dependencies.authService, dependencies.content));
     app.use("/api/v1/auth", createAuthRouter(dependencies.authService));
