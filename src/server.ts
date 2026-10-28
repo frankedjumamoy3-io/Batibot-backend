@@ -8,6 +8,7 @@ import { checkDatabase, createDatabasePool } from "./database/pool.js";
 import { QuizRepository } from "./quizzes/repository.js";
 import { ContentRepository } from "./content/repository.js";
 import { LearnerProgressRepository } from "./learners/progress-repository.js";
+import { AdminInsightsRepository } from "./analytics/admin-insights-repository.js";
 
 const environment = loadEnvironment();
 const configuration = requireServiceConfiguration(environment);
@@ -15,6 +16,7 @@ const pool = createDatabasePool(configuration.databaseUrl, environment.DATABASE_
 const users = new UserRepository(pool);
 const authService = new AuthService(pool, users, environment);
 const app = createApp(environment, {
+  adminInsights: new AdminInsightsRepository(pool),
   learnerProgress: new LearnerProgressRepository(pool),
   content: new ContentRepository(pool),
   quizzes: new QuizRepository(pool),

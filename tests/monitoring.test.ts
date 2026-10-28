@@ -84,4 +84,11 @@ describe("admin system monitoring", () => {
       uptimeSeconds: expect.any(Number),
     });
   });
+
+  it("reports degraded health when the database check fails", async () => {
+    const app = createApp(testEnvironment, { authService, quizzes, databaseHealthCheck: async () => { throw new Error("database unavailable"); } });
+    const token = (await authService.login(ADMIN_EMAIL, ADMIN_PASSWORD)).accessToken;
+    const response = await request(app).get("/api/v1/admin/monitoring").set("Authorization", `Bearer ${token}`).expect(200);
+    expect(response.body.data).toMatchObject({ status: "degraded", database: { status: "error" }, statisticsStatus: "unavailable" });
+  });
 });

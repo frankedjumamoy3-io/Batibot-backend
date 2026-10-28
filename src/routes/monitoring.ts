@@ -43,12 +43,14 @@ export function createMonitoringRouter(
           totalAttempts: 0,
           totalActivityLogs: 0,
         };
+        let statisticsStatus = "unavailable";
 
         if (quizzes && dbStatus === "connected") {
           try {
             quizStats = await quizzes.stats();
+            statisticsStatus = "connected";
           } catch {
-            // Keep zero counts if stats query fails
+            statisticsStatus = "error";
           }
         }
 
@@ -68,7 +70,8 @@ export function createMonitoringRouter(
           },
           nodeVersion: process.version,
           quizzes: quizStats,
-          status: "healthy",
+          statisticsStatus,
+          status: dbStatus === "connected" && statisticsStatus === "connected" ? "healthy" : "degraded",
           timestamp: new Date().toISOString(),
           uptimeSeconds: Math.floor(process.uptime()),
         });

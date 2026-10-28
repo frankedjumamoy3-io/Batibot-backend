@@ -11,6 +11,8 @@ import { createAdminStatusRouter } from "./routes/admin-status.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createHealthRouter } from "./routes/health.js";
 import { createMonitoringRouter } from "./routes/monitoring.js";
+import { createAdminInsightsRouter } from "./routes/admin-insights.js";
+import type { AdminInsightsRepository } from "./analytics/admin-insights-repository.js";
 import { statusRouter } from "./routes/status.js";
 import { createQuizRouter } from "./routes/quizzes.js";
 import type { QuizRepository } from "./quizzes/repository.js";
@@ -23,6 +25,7 @@ import type { LearnerProgressRepository } from "./learners/progress-repository.j
 import { createLearnerProgressRouter } from "./routes/learner-progress.js";
 
 export interface ApplicationDependencies {
+  adminInsights?: AdminInsightsRepository;
   learnerProgress?: LearnerProgressRepository;
   generator?: ContentGenerator;
   content?: ContentRepository;
@@ -71,6 +74,7 @@ export function createApp(
   app.use("/health", createHealthRouter(dependencies.databaseHealthCheck));
   app.use("/api/v1/status", statusRouter);
   if (dependencies.authService) {
+    if (dependencies.adminInsights) app.use("/api/v1/admin/insights", createAdminInsightsRouter(dependencies.authService, dependencies.adminInsights));
     if (dependencies.learnerProgress) app.use("/api/v1/learner/progress", createLearnerProgressRouter(dependencies.authService, dependencies.learnerProgress));
     app.use("/api/v1/admin/ai", createAiRouter(dependencies.authService, dependencies.generator ?? new OpenAIGenerator(environment)));
     if (dependencies.content) app.use("/api/v1", createContentRouter(dependencies.authService, dependencies.content));
