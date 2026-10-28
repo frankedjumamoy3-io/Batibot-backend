@@ -19,8 +19,8 @@ describe("deployment smoke checks", () => {
 
   it("checks health, database-backed reads and unauthenticated access without writes", async () => {
     const request = healthy().mockImplementation(async () => reply({ error: { code: "AUTH_REQUIRED" } }, 401));
-    expect(await smokeDeployment("https://test.onrender.com", request)).toHaveLength(6);
-    expect(request).toHaveBeenCalledTimes(6);
+    expect(await smokeDeployment("https://test.onrender.com", request)).toHaveLength(7);
+    expect(request).toHaveBeenCalledTimes(7);
     expect(request.mock.calls.every(([, options]) => !options?.method)).toBe(true);
   });
 
@@ -32,5 +32,12 @@ describe("deployment smoke checks", () => {
   it("fails when a protected route becomes public", async () => {
     const request = healthy().mockResolvedValue(reply({ data: {} }));
     await expect(smokeDeployment("https://test.onrender.com", request)).rejects.toThrow("/api/v1/auth/me");
+  });
+
+  it("fails when the deployed backend is missing learner progress", async () => {
+    const request = healthy()
+      .mockResolvedValueOnce(reply({ error: { code: "AUTH_REQUIRED" } }, 401))
+      .mockResolvedValueOnce(reply({ error: { code: "NOT_FOUND" } }, 404));
+    await expect(smokeDeployment("https://test.onrender.com", request)).rejects.toThrow("/api/v1/learner/progress");
   });
 });

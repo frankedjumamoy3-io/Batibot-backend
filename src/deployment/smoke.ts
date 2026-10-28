@@ -24,7 +24,7 @@ export async function smokeDeployment(origin: string, request: typeof fetch = fe
       apiVersion: z.literal("v1"), status: z.literal("ready"),
     }) }) },
     { path: "/api/v1/quizzes?limit=1", status: 200, schema: z.object({ data: z.object({ items: z.array(z.unknown()) }) }) },
-    ...["/api/v1/auth/me", "/api/v1/admin/quizzes", "/api/v1/admin/activity-logs"].map(path => ({
+    ...["/api/v1/auth/me", "/api/v1/learner/progress", "/api/v1/admin/quizzes", "/api/v1/admin/activity-logs"].map(path => ({
       path, status: 401, schema: z.object({ error: z.object({ code: z.literal("AUTH_REQUIRED") }) }),
     })),
   ];
