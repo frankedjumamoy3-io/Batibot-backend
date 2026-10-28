@@ -37,6 +37,7 @@ describe("BatiBot API foundation", () => {
 
     expect(response.body.data).toEqual({
       apiVersion: "v1",
+      revision: process.env.RENDER_GIT_COMMIT?.slice(0, 12) ?? null,
       service: "batibot-backend",
       status: "ready",
     });
